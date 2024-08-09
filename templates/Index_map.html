@@ -1,0 +1,99 @@
+{% include "header.html" %}
+
+<div class="col-md-5">
+    <a href='/'>Back to home page</a><br>
+    <h5 style="margin-bottom:10px">Here is your selected cafe</h5>
+
+    <div class="card border-0 my-2">
+
+        <div class="row">
+            <div class="col-md-6">
+                <img src={{cafe.img_url}} class="card-img" alt="">
+            </div>
+            <div class="col-md-6">
+                <div class="card-body py-3">
+                    <h5 class="card-title">{{cafe.name}}</h5>
+                    <h6>{{cafe.location}}</h6>
+                    <p>
+                        {% if cafe.has_wifi == 1:%}
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor"
+                             class="bi bi-wifi" viewBox="0 0 16 16">
+                            <path d="M15.384 6.115a.485.485 0 0 0-.047-.736A12.44 12.44 0 0 0 8 3C5.259 3 2.723 3.882.663 5.379a.485.485 0 0 0-.048.736.52.52 0 0 0 .668.05A11.45 11.45 0 0 1 8 4c2.507 0 4.827.802 6.716 2.164.205.148.49.13.668-.049"></path>
+                            <path d="M13.229 8.271a.482.482 0 0 0-.063-.745A9.46 9.46 0 0 0 8 6c-1.905 0-3.68.56-5.166 1.526a.48.48 0 0 0-.063.745.525.525 0 0 0 .652.065A8.46 8.46 0 0 1 8 7a8.46 8.46 0 0 1 4.576 1.336c.206.132.48.108.653-.065m-2.183 2.183c.226-.226.185-.605-.1-.75A6.5 6.5 0 0 0 8 9c-1.06 0-2.062.254-2.946.704-.285.145-.326.524-.1.75l.015.015c.16.16.407.19.611.09A5.5 5.5 0 0 1 8 10c.868 0 1.69.201 2.42.56.203.1.45.07.61-.091zM9.06 12.44c.196-.196.198-.52-.04-.66A2 2 0 0 0 8 11.5a2 2 0 0 0-1.02.28c-.238.14-.236.464-.04.66l.706.706a.5.5 0 0 0 .707 0l.707-.707z"></path>
+                        </svg>
+                        {% endif %}
+                        {% if cafe.has_sockets == 1:%}
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                             class="bi bi-plug-fill" viewBox="0 0 16 16">
+                            <path d="M6 0a.5.5 0 0 1 .5.5V3h3V.5a.5.5 0 0 1 1 0V3h1a.5.5 0 0 1 .5.5v3A3.5 3.5 0 0 1 8.5 10c-.002.434-.01.845-.04 1.22-.041.514-.126 1.003-.317 1.424a2.08 2.08 0 0 1-.97 1.028C6.725 13.9 6.169 14 5.5 14c-.998 0-1.61.33-1.974.718A1.92 1.92 0 0 0 3 16H2c0-.616.232-1.367.797-1.968C3.374 13.42 4.261 13 5.5 13c.581 0 .962-.088 1.218-.219.241-.123.4-.3.514-.55.121-.266.193-.621.23-1.09.027-.34.035-.718.037-1.141A3.5 3.5 0 0 1 4 6.5v-3a.5.5 0 0 1 .5-.5h1V.5A.5.5 0 0 1 6 0"/>
+                        </svg>
+                        {% endif %}
+
+                        {% if cafe.has_toilet == 1:%}
+                        <img width='16' height='16' src='./static/assets/toilet.svg' mr-4>
+                        {% endif %}
+
+                        {% if cafe.can_take_calls == 1:%}
+                        <img width='16' height='16' src='static/assets/phone.svg'>
+                        {% endif %}
+                        <br>
+                        Seats: {{cafe.seats}}
+                        <br>
+                        Coffee Price: ${{cafe.coffee_price}}
+                    </p>
+
+                    <a href={{url_for('home_map', id=cafe.id)}}>Map</a><br>
+                    {% if current_user.email == 'abc@admin.com' :%}
+                    <a href={{url_for('editcafe', cafe_id=cafe.id)}}>Edit Cafe Info</a><br>
+                    <a href={{url_for('delete_cafe', d_id=cafe.id)}}>Delete Cafe</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="col-md-4">
+    <h4>Map</h4>
+    <iframe src={{link}} width=100% height="750" style="border:0;" allowfullscreen="" loading="lazy"
+            referrerpolicy="no-referrer-when-downgrade"></iframe>
+</div>
+</div>
+
+{% include "footer.html" %}
+<script>
+
+    const toCurrency = (n, curr, LanguageFormat = undefined) =>
+      Intl.NumberFormat(LanguageFormat, {
+        style: 'currency',
+        currency: curr,
+      }).format(n);
+
+    const allRanges = document.querySelectorAll(".range-wrap");
+    allRanges.forEach(wrap => {
+      const range = wrap.querySelector(".form-range");
+      const bubble = wrap.querySelector(".bubble");
+
+      range.addEventListener("input", () => {
+        setBubble(range, bubble);
+      });
+      setBubble(range, bubble);
+    });
+
+    function setBubble(range, bubble) {
+      const val = range.value;
+      const c_val = toCurrency(val, 'USD');
+      const min = range.min ? range.min : 0;
+      const max = range.max ? range.max : 100;
+      const newVal = Number(((val - min) * 100) / (max - min));
+      bubble.innerHTML = c_val;
+
+      // Sorta magic numbers based on size of the native UI thumb
+      bubble.style.left = `calc(${newVal}% + (${8 - newVal * 0.15}px))`;
+    }
+</script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+        crossorigin="anonymous"></script>
+</body>
+</html>
